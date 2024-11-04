@@ -7,12 +7,15 @@ import random
 import time
 from kafka import KafkaProducer
 
+# Kafka producer that sends data to server at localhost:9092 (broker container)
 producer = KafkaProducer(bootstrap_servers='localhost:9092')
 
+# 2 topics created
 t1 = "test-topic"
 t2 = "test-topic-2"
 
-t = t1      # Choose topic
+# select topic to publish on
+t = t1
 while True:
     k = f"{random.randint(10, 99)}".encode()
     v = f"{random.randint(10, 99)}".encode()
