@@ -15,7 +15,7 @@ Each service (broker, publisher, consumer) ideally runs in its own container man
 
 ---
 
-### ![immagine](https://github.com/user-attachments/assets/e8c07b85-251e-44f5-bf53-23fe95e3bb1f) Python Packages Used
+### ![packages](https://github.com/user-attachments/assets/e8c07b85-251e-44f5-bf53-23fe95e3bb1f =50x50) Python Packages Used
 | Package       | Version |
 |---------------|---------|
 | kafka-python  | 2.0.2   |
