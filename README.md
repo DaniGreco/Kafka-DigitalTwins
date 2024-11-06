@@ -30,6 +30,23 @@ To set up the test environment, you'll need the following:
 - [Kafka Docker Image](https://hub.docker.com/r/apache/kafka): A Docker image of the Apache Kafka broker.
 - [Python Code](https://needablackcoffee.medium.com/learn-apache-kafka-with-these-python-examples-454b5275109e): Refer to this quickstart guide.
 
+### Quickstart guide
+Run the **Docker container** named 'broker':
+```console
+docker run -d --name broker apache/kafka:latest
+```
+Open **shell in broker** container to execute bash code in the container:
+```console
+docker exec --workdir /opt/kafka/bin/ -it broker sh
+```
+**Create a topic** (if using `docker compose` it is possible to set the automatic generation of a topic upon first publication):
+```console
+./kafka-topics.sh --bootstrap-server localhost:9092 --create --topic test-topic
+```
+
+Double-check the name of the topics in the scripts (add if necessary).</br>
+**Run the two scripts** `testConsumer.py` and `testProducer.py` and check the consoles.
+
 ---
 
 ## Project To-Do
