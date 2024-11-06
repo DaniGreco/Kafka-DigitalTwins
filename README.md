@@ -27,11 +27,11 @@ Each service (broker, publisher, consumer) ideally runs in its own container man
 
 ### Prerequisites
 To set up the test environment, you'll need the following:
-- [Kafka Docker Image](https://hub.docker.com/r/apache/kafka): A Docker image of the Apache Kafka broker.
-- [Python Code](https://needablackcoffee.medium.com/learn-apache-kafka-with-these-python-examples-454b5275109e): Refer to this quickstart guide.
+- [Kafka Docker Image](https://hub.docker.com/r/apache/kafka): Quickstart guide and detailed overview to set up the `apache/kafka` Docker image.
+- [Python Code](https://needablackcoffee.medium.com/learn-apache-kafka-with-these-python-examples-454b5275109e): Refer to this quickstart guide for the python scripts.
 
 ### Quickstart guide
-Run the **Docker container** named 'broker':
+Run the **Docker container** named `broker`:
 ```console
 docker run -d --name broker apache/kafka:latest
 ```
