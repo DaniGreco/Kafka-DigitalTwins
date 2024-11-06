@@ -15,14 +15,19 @@ t1 = "test-topic"
 t2 = "test-topic-2"
 
 # select topic to publish on
-t = t1
+t = t2
 while True:
     k = f"{random.randint(10, 99)}".encode()
     v = f"{random.randint(10, 99)}".encode()
+
     producer.send(
         topic=t,
         key=k,
         value=v
     )
-    print("topic: " + t + " | key: " + k.decode() + " | value: " + v.decode())
+
+    print(f"topic: {t} | "
+          f"key: {k.decode()} | "
+          f"value: {v.decode()}")
+
     time.sleep(1)
