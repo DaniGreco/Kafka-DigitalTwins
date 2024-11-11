@@ -20,4 +20,4 @@ It may take some time to start up all correctly (even some minutes). If after a 
 
 ## Project To-Do
 - **Schema for data handling**: Define a structured schema for the messages to be handled more efficiently.
-- **docker-compose.yml**: Create a `docker-compose.yml` file containing at least one Kafka broker and multiple containers for publishers and consumers.
+- **docker-compose.yml**: Fix the `docker-compose.yml` file.
