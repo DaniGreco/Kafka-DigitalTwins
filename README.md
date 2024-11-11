@@ -27,25 +27,14 @@ Each service (broker, publisher, consumer) ideally runs in its own container man
 
 ### Prerequisites
 To set up the test environment, you'll need the following:
-- [Kafka Docker Image](https://hub.docker.com/r/apache/kafka): Quickstart guide and detailed overview to set up the `apache/kafka` Docker image.
-- [Python Code](https://needablackcoffee.medium.com/learn-apache-kafka-with-these-python-examples-454b5275109e): Refer to this quickstart guide for the python scripts.
+- [Docker](https://www.docker.com/)
 
-### Quickstart guide
-Run the **Docker container** named `broker`:
+### Quickstart guide (WORK IN PROGRESS)
+Run the **docker-compose.yaml** file inside the main directory:
 ```console
-docker run -d --name broker apache/kafka:latest
+docker-compose up --build
 ```
-Open **shell in broker** container to execute bash code in the container:
-```console
-docker exec --workdir /opt/kafka/bin/ -it broker sh
-```
-**Create a topic** (if using `docker compose` it is possible to set the automatic generation of a topic upon first publication):
-```console
-./kafka-topics.sh --bootstrap-server localhost:9092 --create --topic test-topic
-```
-
-Double-check the name of the topics in the scripts (add if necessary).</br>
-**Run the two scripts** `testConsumer.py` and `testProducer.py` and check the consoles.
+It may take some time to start up all correctly (even some minutes). If after a few minutes the `consumer` and `producer` containers do not start, do it manually via docker.
 
 ---
 
