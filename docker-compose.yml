@@ -1,0 +1,49 @@
+version: '3.8'
+services:
+  zookeeper:
+    image: zookeeper:3.6
+    container_name: zookeeper
+    networks:
+      - kafka-network
+    ports:
+      - "2181:2181"
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+
+  kafka:
+    image: confluentinc/cp-kafka
+    container_name: kafka
+    networks:
+      - kafka-network
+    ports:
+      - "9092:9092"
+    environment:
+      KAFKA_ZOOKEEPER_CONNECT: "zookeeper:2181"
+      KAFKA_ADVERTISED_LISTENERS: "PLAINTEXT://kafka:9092"
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+
+  producer:
+    build:
+      context: ./producer
+    container_name: producer
+    networks:
+      - kafka-network
+    depends_on:
+      - kafka
+    environment:
+      KAFKA_BOOTSTRAP_SERVERS: "kafka:9092"
+
+  consumer:
+    build:
+      context: ./consumer
+    container_name: consumer
+    networks:
+      - kafka-network
+    depends_on:
+      - kafka
+    environment:
+      KAFKA_BOOTSTRAP_SERVERS: "kafka:9092"
+
+networks:
+  kafka-network:
+    driver: bridge
