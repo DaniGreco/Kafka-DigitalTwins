@@ -15,14 +15,6 @@ Each service (broker, publisher, consumer) ideally runs in its own container man
 
 ---
 
-### 📦 Python Packages Used
-| Package       | Version |
-|---------------|---------|
-| kafka-python  | 2.0.2   |
-| six           | 1.16.0  |
-
----
-
 ## Getting Started
 
 ### Prerequisites
