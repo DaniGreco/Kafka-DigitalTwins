@@ -16,11 +16,6 @@ services:
       CLUSTER_ID: "SCARRAFONE123"
     volumes:
       - controller-1-data:/bitnami/kafka
-    healthcheck:
-      test: [ "CMD", "kafka-broker-api-versions", "--bootstrap-server", "controller-1:9093" ]
-      interval: 10s
-      timeout: 60s
-      retries: 5
 
   controller-2:
     image: confluentinc/cp-kafka
@@ -38,11 +33,6 @@ services:
       CLUSTER_ID: "SCARRAFONE123"
     volumes:
       - controller-2-data:/bitnami/kafka
-    healthcheck:
-      test: [ "CMD", "kafka-broker-api-versions", "--bootstrap-server", "controller-2:9093" ]
-      interval: 10s
-      timeout: 60s
-      retries: 5
 
   controller-3:
     image: confluentinc/cp-kafka
@@ -60,11 +50,6 @@ services:
       CLUSTER_ID: "SCARRAFONE123"
     volumes:
       - controller-3-data:/bitnami/kafka
-    healthcheck:
-      test: [ "CMD", "kafka-broker-api-versions", "--bootstrap-server", "controller-3:9093" ]
-      interval: 10s
-      timeout: 60s
-      retries: 5
 
   broker:
     image: confluentinc/cp-kafka
