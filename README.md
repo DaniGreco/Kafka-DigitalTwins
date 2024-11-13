@@ -14,7 +14,7 @@ Run the **docker-compose.yaml** file inside the main directory:
 ```console
 docker-compose up --build
 ```
-It may take some time to start up all correctly (even some minutes). If after a few minutes the `consumer` and `producer` containers do not start, do it manually via docker.
+It may take some time to start up all correctly (even some minutes). If after a few minutes the `consumer` and `producer` containers do not start, do it manually via docker.</br>
 
 ---
 
