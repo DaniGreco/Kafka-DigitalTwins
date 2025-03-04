@@ -3,7 +3,7 @@ import os
 from kafka import KafkaProducer
 import zmq
 
-# Configuration Logging
+# Configurazione Logging
 log_dir = "./logs"
 os.makedirs(log_dir, exist_ok=True)
 logging.basicConfig(
@@ -19,7 +19,8 @@ topic = 'my-topic'
 # Configurazione ZeroMQ
 context = zmq.Context()
 socket = context.socket(zmq.SUB)
-socket.connect("tcp://host.docker.internal:5555")  # Connessione a ZeroMQ in locale
+# ESEGUIRE PRIMA IL SERVER
+socket.connect("tcp://host.docker.internal:5555")  # Connessione a ZeroMQ in server locale
 socket.setsockopt_string(zmq.SUBSCRIBE, "")  # Sottoscrizione a tutti i messaggi
 
 print("Bridge ZeroMQ -> Kafka avviato...")
