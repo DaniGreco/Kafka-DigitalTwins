@@ -162,6 +162,3 @@ cython_debug/
 .idea/
 # devcontainer stuff
 devcontainer.json
-
-# logs folder
-producer/logs/*
