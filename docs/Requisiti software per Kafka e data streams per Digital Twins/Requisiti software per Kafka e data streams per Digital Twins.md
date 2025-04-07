@@ -184,15 +184,19 @@ La presente sezione è accompagnata da diagrammi UML che supportano la descrizio
 
 - UML - Use case diagram
 
-![Immagine che contiene testo, diagramma, Piano, schizzo
 
-Il contenuto generato dall'IA potrebbe non essere corretto.](Aspose.Words.b17649bf-ef95-464c-98f6-5ed9a34ab16f.003.png)
+![Immagine che contiene testo, diagramma, cerchio, schermata
+
+Il contenuto generato dall'IA potrebbe non essere corretto.](Aspose.Words.38a0fef5-2a8d-4206-b78e-1b55a554b730.003.png)
+
 
 - UML - Sequence diagram
 
+
+
 ![Immagine che contiene testo, ricevuta, linea, diagramma
 
-Il contenuto generato dall'IA potrebbe non essere corretto.](Aspose.Words.b17649bf-ef95-464c-98f6-5ed9a34ab16f.004.png)
+Il contenuto generato dall'IA potrebbe non essere corretto.](Aspose.Words.38a0fef5-2a8d-4206-b78e-1b55a554b730.004.png)
 **
 
 ## <a name="_toc194859378"></a>**3.5 Tracciabilità dei requisiti**
@@ -214,7 +218,7 @@ Descrizione dell'architettura e il ruolo del broker Kafka nella pipeline, spiega
 
 ![Immagine che contiene diagramma, Disegno tecnico, Piano, schizzo
 
-Il contenuto generato dall'IA potrebbe non essere corretto.](Aspose.Words.b17649bf-ef95-464c-98f6-5ed9a34ab16f.005.jpeg)
+Il contenuto generato dall'IA potrebbe non essere corretto.](Aspose.Words.38a0fef5-2a8d-4206-b78e-1b55a554b730.005.jpeg)
 
 
 
@@ -767,5 +771,5 @@ Foselab: *Kafka-DigitalTwins*. Repository GitHub, 2024. Disponibile su: 
 
 [Immagine che contiene testo, diagramma, linea, Parallelo
 
-Descrizione generata automaticamente]: Aspose.Words.b17649bf-ef95-464c-98f6-5ed9a34ab16f.001.png
-[ref1]: Aspose.Words.b17649bf-ef95-464c-98f6-5ed9a34ab16f.002.png
+Descrizione generata automaticamente]: Aspose.Words.38a0fef5-2a8d-4206-b78e-1b55a554b730.001.png
+[ref1]: Aspose.Words.38a0fef5-2a8d-4206-b78e-1b55a554b730.002.png
