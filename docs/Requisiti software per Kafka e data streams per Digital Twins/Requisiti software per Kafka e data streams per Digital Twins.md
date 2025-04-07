@@ -79,9 +79,7 @@ Il documento include:
 
 - Descrizione delle funzionalità richieste per la pipeline dati.
 - Requisiti funzionali, non funzionali e di sicurezza.
-- Specifiche tecniche per implementare la pipeline.
-
-**
+- Specifiche tecniche per implementare la pipeline.**
 # <a name="_toc194859368"></a>**2. Descrizione generale**
 ## <a name="_toc194859369"></a>**2.1 Prospettiva del prodotto**
 La pipeline funge da intermediario per la trasmissione dei dati tra:
@@ -110,9 +108,7 @@ Possibili utenti del sistema con i loro relativi utilizzi:
 
 - Ricercatori: Analizzano i dati storici, inizializzano la simulazione e aggiungono simulatori.
 - Sviluppatore: Crea interfacce e configura Kafka.
-- Physical twins: Generano e scambiano dati.
-
-**
+- Physical twins: Generano e scambiano dati.**
 ## <a name="_toc194859372"></a>**2.4 Vincoli**
 Descrizione dei vincoli tecnici e operativi del progetto, tra cui i formati dati supportati, i protocolli utilizzati, e i limiti architetturali. Tali vincoli definiscono le regole entro cui il sistema deve operare.
 
@@ -187,7 +183,7 @@ La presente sezione è accompagnata da diagrammi UML che supportano la descrizio
 
 ![Immagine che contiene testo, diagramma, cerchio, schermata
 
-Il contenuto generato dall'IA potrebbe non essere corretto.](Aspose.Words.38a0fef5-2a8d-4206-b78e-1b55a554b730.003.png)
+Il contenuto generato dall'IA potrebbe non essere corretto.](Aspose.Words.745173c1-0ae6-4238-9f04-cfb9be76f94a.003.png)
 
 
 - UML - Sequence diagram
@@ -196,7 +192,7 @@ Il contenuto generato dall'IA potrebbe non essere corretto.](Aspose.Words.38a0fe
 
 ![Immagine che contiene testo, ricevuta, linea, diagramma
 
-Il contenuto generato dall'IA potrebbe non essere corretto.](Aspose.Words.38a0fef5-2a8d-4206-b78e-1b55a554b730.004.png)
+Il contenuto generato dall'IA potrebbe non essere corretto.](Aspose.Words.745173c1-0ae6-4238-9f04-cfb9be76f94a.004.png)
 **
 
 ## <a name="_toc194859378"></a>**3.5 Tracciabilità dei requisiti**
@@ -210,15 +206,15 @@ La matrice di tracciabilità dei requisiti collega i requisiti principali alle i
 |RF-4|Tutti|Kafka con topic configurabili|Test aggiunta dinamica topic|
 |RF-5|Ricercatori|Digital Twin processa i dati in tempo reale|Test latenza < 50 ms|
 |RF-6|Sviluppatori|Containerizzazione con Docker|Verifica esecuzione in container|
-
 **
+
 # <a name="_toc194859379"></a>**4. Specifiche tecniche**
 ## <a name="_toc194859380"></a>**4.1 Broker Kafka**
 Descrizione dell'architettura e il ruolo del broker Kafka nella pipeline, spiegando come Kafka gestisce i topic, garantendo un flusso di dati affidabile tra le entità della pipeline. 
 
 ![Immagine che contiene diagramma, Disegno tecnico, Piano, schizzo
 
-Il contenuto generato dall'IA potrebbe non essere corretto.](Aspose.Words.38a0fef5-2a8d-4206-b78e-1b55a554b730.005.jpeg)
+Il contenuto generato dall'IA potrebbe non essere corretto.](Aspose.Words.745173c1-0ae6-4238-9f04-cfb9be76f94a.005.jpeg)
 
 
 
@@ -256,9 +252,7 @@ Il sistema Kafka è configurato in un cluster composto da quattro container:
 
 La comunicazione tra i container delle interfacce e Kafka avviene tramite porte esposte e configurate secondo il protocollo Kafka (protocollo TCP, porte default 9092 o configurabili).
 
-La comunicazione tra i container delle interfacce e i rispettivi simulatori dipende dal protocollo implementato dal simulatore stesso (es. ZeroMQ o REST), e viene gestita caso per caso.
-
-**
+La comunicazione tra i container delle interfacce e i rispettivi simulatori dipende dal protocollo implementato dal simulatore stesso (es. ZeroMQ o REST), e viene gestita caso per caso.**
 # <a name="_toc194859383"></a>**5. Appendici**
 ## <a name="_toc194859384"></a>**5.1 Glossario**
 *Physical Twin*: Sistemi fisici o simulatori che generano dati, ovvero il paziente ospedaliero, il ventilatore polmonare.
@@ -771,5 +765,5 @@ Foselab: *Kafka-DigitalTwins*. Repository GitHub, 2024. Disponibile su: 
 
 [Immagine che contiene testo, diagramma, linea, Parallelo
 
-Descrizione generata automaticamente]: Aspose.Words.38a0fef5-2a8d-4206-b78e-1b55a554b730.001.png
-[ref1]: Aspose.Words.38a0fef5-2a8d-4206-b78e-1b55a554b730.002.png
+Descrizione generata automaticamente]: Aspose.Words.745173c1-0ae6-4238-9f04-cfb9be76f94a.001.png
+[ref1]: Aspose.Words.745173c1-0ae6-4238-9f04-cfb9be76f94a.002.png
