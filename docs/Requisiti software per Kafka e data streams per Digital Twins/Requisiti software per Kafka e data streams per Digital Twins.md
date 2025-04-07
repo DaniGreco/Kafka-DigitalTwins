@@ -206,7 +206,6 @@ La matrice di tracciabilità dei requisiti collega i requisiti principali alle i
 |RF-4|Tutti|Kafka con topic configurabili|Test aggiunta dinamica topic|
 |RF-5|Ricercatori|Digital Twin processa i dati in tempo reale|Test latenza < 50 ms|
 |RF-6|Sviluppatori|Containerizzazione con Docker|Verifica esecuzione in container|
-**
 
 # <a name="_toc194859379"></a>**4. Specifiche tecniche**
 ## <a name="_toc194859380"></a>**4.1 Broker Kafka**
@@ -238,7 +237,6 @@ Definizione del formato JSON utilizzato per lo scambio dei dati, essenziale per 
 |topic|Indica il topic su cui è stato inviato il messaggio.|
 |status|Indica se la trasmissione è stata eseguita con successo.|
 |payload|Contenuto del messaggio (JSON).|
-**
 
 ## <a name="_toc194859382"></a>**4.3 Containerizzazione**
 Tutti i componenti del sistema, inclusi broker, producer e consumer, devono essere eseguiti all’interno di container separati per garantire portabilità, isolamento e scalabilità.
@@ -759,11 +757,4 @@ Bailón R, Sornmo L, Laguna P.: *Respiratory and Heart Rate Dataset*. ScienceDir
 *Simulatore del corpo umano*. Repository GitHub, 2024. Disponibile su: https://github.com/GionathaPirola/BREATHE/.
 
 Foselab: *Kafka-DigitalTwins*. Repository GitHub, 2024. Disponibile su: https://github.com/foselab/Kafka-DigitalTwins/. 
-2
 
-
-
-[Immagine che contiene testo, diagramma, linea, Parallelo
-
-Descrizione generata automaticamente]: Aspose.Words.b77aa73a-d4b1-4ade-a1d7-a1c0f65ea344.001.png
-[ref1]: Aspose.Words.b77aa73a-d4b1-4ade-a1d7-a1c0f65ea344.002.png
