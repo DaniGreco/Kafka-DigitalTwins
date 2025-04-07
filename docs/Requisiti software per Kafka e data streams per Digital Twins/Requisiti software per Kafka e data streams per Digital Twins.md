@@ -183,7 +183,7 @@ La presente sezione è accompagnata da diagrammi UML che supportano la descrizio
 
 ![Immagine che contiene testo, diagramma, cerchio, schermata
 
-Il contenuto generato dall'IA potrebbe non essere corretto.](Aspose.Words.745173c1-0ae6-4238-9f04-cfb9be76f94a.003.png)
+Il contenuto generato dall'IA potrebbe non essere corretto.](Aspose.Words.b77aa73a-d4b1-4ade-a1d7-a1c0f65ea344.003.png)
 
 
 - UML - Sequence diagram
@@ -192,7 +192,7 @@ Il contenuto generato dall'IA potrebbe non essere corretto.](Aspose.Words.745173
 
 ![Immagine che contiene testo, ricevuta, linea, diagramma
 
-Il contenuto generato dall'IA potrebbe non essere corretto.](Aspose.Words.745173c1-0ae6-4238-9f04-cfb9be76f94a.004.png)
+Il contenuto generato dall'IA potrebbe non essere corretto.](Aspose.Words.b77aa73a-d4b1-4ade-a1d7-a1c0f65ea344.004.png)
 **
 
 ## <a name="_toc194859378"></a>**3.5 Tracciabilità dei requisiti**
@@ -214,7 +214,7 @@ Descrizione dell'architettura e il ruolo del broker Kafka nella pipeline, spiega
 
 ![Immagine che contiene diagramma, Disegno tecnico, Piano, schizzo
 
-Il contenuto generato dall'IA potrebbe non essere corretto.](Aspose.Words.745173c1-0ae6-4238-9f04-cfb9be76f94a.005.jpeg)
+Il contenuto generato dall'IA potrebbe non essere corretto.](Aspose.Words.b77aa73a-d4b1-4ade-a1d7-a1c0f65ea344.005.jpeg)
 
 
 
@@ -238,8 +238,8 @@ Definizione del formato JSON utilizzato per lo scambio dei dati, essenziale per 
 |topic|Indica il topic su cui è stato inviato il messaggio.|
 |status|Indica se la trasmissione è stata eseguita con successo.|
 |payload|Contenuto del messaggio (JSON).|
-
 **
+
 ## <a name="_toc194859382"></a>**4.3 Containerizzazione**
 Tutti i componenti del sistema, inclusi broker, producer e consumer, devono essere eseguiti all’interno di container separati per garantire portabilità, isolamento e scalabilità.
 
@@ -765,5 +765,5 @@ Foselab: *Kafka-DigitalTwins*. Repository GitHub, 2024. Disponibile su: 
 
 [Immagine che contiene testo, diagramma, linea, Parallelo
 
-Descrizione generata automaticamente]: Aspose.Words.745173c1-0ae6-4238-9f04-cfb9be76f94a.001.png
-[ref1]: Aspose.Words.745173c1-0ae6-4238-9f04-cfb9be76f94a.002.png
+Descrizione generata automaticamente]: Aspose.Words.b77aa73a-d4b1-4ade-a1d7-a1c0f65ea344.001.png
+[ref1]: Aspose.Words.b77aa73a-d4b1-4ade-a1d7-a1c0f65ea344.002.png
