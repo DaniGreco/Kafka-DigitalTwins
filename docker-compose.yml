@@ -113,6 +113,8 @@ services:
       context: external/ASMeta/asmeta_server
       dockerfile: Dockerfile
     container_name: asmeta-server
+    networks:
+      - kafka-network
     ports:
       - "8080:8080"
 
