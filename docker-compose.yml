@@ -108,6 +108,14 @@ services:
       broker:
         condition: service_healthy
 
+  asmeta-server:
+    build:
+      context: external/ASMeta/asmeta_server
+      dockerfile: Dockerfile
+    container_name: asmeta-server
+    ports:
+      - "8080:8080"
+
 networks:
   kafka-network:
     driver: bridge

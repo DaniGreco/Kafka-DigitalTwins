@@ -1,3 +1,7 @@
 [submodule "external/breathe"]
 	path = external/breathe
 	url = https://github.com/GionathaPirola/BREATHE.git
+[submodule "external/ASMeta"]
+	path = external/ASMeta
+	url = https://github.com/foselab/AsmetaS-web-service.git
+	branch = server-dockerization
