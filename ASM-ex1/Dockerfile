@@ -1,4 +1,11 @@
-FROM ubuntu:latest
-LABEL authors="danig"
+FROM python:3.9-slim
 
-ENTRYPOINT ["top", "-b"]
+WORKDIR /app
+
+COPY . .
+
+RUN pip install --no-cache-dir -r requirements.txt
+
+RUN chmod +x entrypoint.sh
+
+ENTRYPOINT ["./entrypoint.sh"]

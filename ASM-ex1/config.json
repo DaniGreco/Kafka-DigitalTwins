@@ -2,7 +2,7 @@
   "asmeta_server":{
     "ip": "localhost",
     "base_port": 8080,
-    "spec_path": "/resources/models",
+    "spec_path": "resources/models",
     "runtime_model": "SafetyEnforcerModel.asm"},
   "logging":{
     "level": "INFO",

@@ -110,16 +110,33 @@ services:
 
   asmeta-server:
     build:
-      context: external/ASMeta/asmeta_server
+      context: ./external/ASMeta/asmeta_server
       dockerfile: Dockerfile
     container_name: asmeta-server
     networks:
-      - kafka-network
+      - asmeta-server
     ports:
       - "8080:8080"
 
+  asm1:
+    build:
+      context: ./ASM-ex1
+      dockerfile: Dockerfile
+    container_name: asm1
+    networks:
+      - kafka-network
+    volumes:
+      - ./ASM-ex1/log:/app/log
+      - ./ASM-ex1/config.json:/app/config.json
+    depends_on:
+      - asmeta-server
+    stdin_open: true
+    tty: true
+
 networks:
   kafka-network:
+    driver: bridge
+  asmeta-server:
     driver: bridge
 
 volumes:
