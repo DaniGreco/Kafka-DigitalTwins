@@ -80,6 +80,24 @@ services:
       timeout: 30s
       retries: 5
 
+  kafka-setup:
+    image: confluentinc/cp-kafka:latest
+    container_name: kafka-setup
+    networks:
+      - kafka-network
+    depends_on:
+      broker:
+        condition: service_healthy
+    entrypoint: [ '/bin/sh', '-c' ]
+    command:
+      - |
+        echo "Waiting for Kafka to be ready..."
+        cub kafka-ready -b broker:9092 1 20
+        echo "Creating topics..."
+        kafka-topics --create --if-not-exists --topic asm1-output --bootstrap-server broker:9092 --partitions 1 --replication-factor 1
+        kafka-topics --create --if-not-exists --topic asm3-output --bootstrap-server broker:9092 --partitions 1 --replication-factor 1
+        echo "Topics created."
+
   producer:
     build:
       context: ./producer
@@ -117,24 +135,63 @@ services:
       - asmeta-server
     ports:
       - "8080:8080"
-    depends_on:
-      broker:
-        condition: service_healthy
 
-#  asm1:
-#    build:
-#      context: ./ASM-ex1
-#      dockerfile: Dockerfile
-#    container_name: asm1
-#    networks:
-#      - kafka-network
-#    volumes:
-#      - ./ASM-ex1/log:/app/log
-#      - ./ASM-ex1/config.json:/app/config.json
-#    depends_on:
-#      - asmeta-server
-#    stdin_open: true
-#    tty: true
+  asm1:
+    build:
+      context: ./ASM-ex1
+      dockerfile: Dockerfile
+    container_name: asm1
+    networks:
+      - kafka-network
+      - asmeta-server
+    volumes:
+      - ./ASM-ex1/log:/app/log
+      - ./ASM-ex1/config.json:/app/config.json
+    depends_on:
+      kafka-setup:
+        condition: service_completed_successfully
+      asmeta-server:
+        condition: service_started
+    stdin_open: true
+    tty: true
+
+  asm2:
+    build:
+      context: ./ASM-ex2
+      dockerfile: Dockerfile
+    container_name: asm2
+    networks:
+      - kafka-network
+      - asmeta-server
+    volumes:
+      - ./ASM-ex2/log:/app/log
+      - ./ASM-ex2/config.json:/app/config.json
+    depends_on:
+      kafka-setup:
+        condition: service_completed_successfully
+      asmeta-server:
+        condition: service_started
+    stdin_open: true
+    tty: true
+
+  asm3:
+    build:
+      context: ./ASM-ex3
+      dockerfile: Dockerfile
+    container_name: asm3
+    networks:
+      - kafka-network
+      - asmeta-server
+    volumes:
+      - ./ASM-ex3/log:/app/log
+      - ./ASM-ex3/config.json:/app/config.json
+    depends_on:
+      kafka-setup:
+        condition: service_completed_successfully
+      asmeta-server:
+        condition: service_started
+    stdin_open: true
+    tty: true
 
 networks:
   kafka-network:

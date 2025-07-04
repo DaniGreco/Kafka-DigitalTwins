@@ -1,0 +1,5 @@
+site_name: Kafka-DigitalTwins Documentation
+theme:
+  name: material
+nav:
+  - Home: index.md
