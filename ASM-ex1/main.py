@@ -7,6 +7,10 @@ import os
 import sys
 import uuid
 import time
+import json
+from kafka import KafkaProducer
+from kafka.errors import KafkaError
+
 # Aggiunge la directory padre al sys.path
 #sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
@@ -15,7 +19,7 @@ from configuration_manager import ConfigurationManager
 from model_uploader import ModelUploader
 from enforcer import EnforcerExample
 
-def run(enforcer:EnforcerExample, model_uploader:ModelUploader):
+def run(enforcer:EnforcerExample, model_uploader:ModelUploader, producer: KafkaProducer, topic: str):
     """
     Run a series of tests for the Target System, with or without an ASM model used as enforcement policy specification
 
@@ -23,6 +27,8 @@ def run(enforcer:EnforcerExample, model_uploader:ModelUploader):
 
         enforcer (Enforcer or None):  enforcement module (if any) to validate and correct actions.
         model_uploader(ModelUploader or None): module for uploading the ASM model and its libraries.
+        producer (KafkaProducer): Kafka producer to send messages.
+        topic (str): Kafka topic to send messages to.
    
     Returns:
         None
@@ -52,11 +58,13 @@ def run(enforcer:EnforcerExample, model_uploader:ModelUploader):
     done = False
     while not done:
         logger.info("--Executing new step--")
-        # Observe the environment and the target system: your logics goes here (it's application-specific)
-        # ... 
-        # No target system exists in this version, so for testing purposes, target system's inputs/outputs and probes are simulated via user inputs
-        out_action = input('Target system action (FASTER, SLOWER, IDLE, LANE_LEFT, LANE_RIGHT): ') #example of out action of the target system to sanitize
-        right_lane_free = input('Is right lane free (true, false)?: ') #example of probe event
+        # Automated execution: run for a fixed number of steps
+        # Define a list of predefined actions
+        actions = ["FASTER", "LANE_RIGHT", "SLOWER", "LANE_LEFT", "IDLE"]
+        out_action = actions[n_step % len(actions)]
+        right_lane_free = "true" if n_step % 2 == 0 else "false"
+
+        print(f"[ASM-1] Step {n_step}: Action: {out_action}, Right Lane Free: {right_lane_free}")
         
         # If the enforcer is running, try to sanitise the system's output with the ASM enforcement model
         if execute_enforcer:
@@ -80,7 +88,19 @@ def run(enforcer:EnforcerExample, model_uploader:ModelUploader):
                 logger.info(f"Action: {out_action}")
         # Run the step on the environment using the effector interface
         # No target system exists in this version, so we do nothing.  
-        done = input('Do you want to stop execution (enter T to stop, any other character to continue)?: ') == 'T'  #for running a certain number of tests
+        
+        # Send the action to Kafka
+        try:
+            future = producer.send(topic, {'action': out_action})
+            record_metadata = future.get(timeout=10)
+            logger.info(f"Sent message to Kafka topic {topic}: {out_action} at offset {record_metadata.offset}")
+            print(f"[ASM-1 PRODUCER] Sent: {out_action} to topic {topic}")
+        except KafkaError as e:
+            logger.error(f"Failed to send message to Kafka: {e}")
+
+        # Automated execution: run indefinitely
+        done = False
+        time.sleep(1) # Add a small delay to simulate real-time processing
             
     # Stop the execution of the runtime model
     if execute_enforcer:
@@ -125,17 +145,32 @@ if __name__ == '__main__':
     logger.info(f"Loaded config.json - Starting execution with id {execution_id}")
     config_manager.log_configuration()
 
+    # Kafka Producer Setup
+    kafka_params = config_manager.get_kafka_params()
+    producer = None
+    if kafka_params:
+        try:
+            producer = KafkaProducer(
+                bootstrap_servers=kafka_params['bootstrap_servers'],
+                value_serializer=lambda v: json.dumps(v).encode('utf-8')
+            )
+            logger.info("Kafka producer initialized successfully.")
+        except KafkaError as e:
+            logger.error(f"Failed to initialize Kafka producer: {e}")
+
     # Run the ASM model
     ip, port, asm_path, asm_file_name = config_manager.get_server_params()
     enforcer = EnforcerExample(ip, port, asm_file_name)
     model_uploader = ModelUploader(ip, port, asm_path, asm_file_name)
     try:            
-        run(enforcer,model_uploader)
+        run(enforcer, model_uploader, producer, kafka_params.get('topic'))
     except Exception as e:
         # Try to run the tests again without the ASM model if at a certain point the server is down  
-        logger.error("Failed to connect to the server - Executing the test runs WITHOUT the model")            
-        run(None, None)
-    #else:
-    #    run(None, None)
+        logger.error(f"Failed to connect to the server - Executing the test runs WITHOUT the model")            
+        run(None, None, None, None)
+    finally:
+        if producer:
+            producer.close()
+            logger.info("Kafka producer closed.")
 
 

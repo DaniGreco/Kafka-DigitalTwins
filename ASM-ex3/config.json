@@ -12,6 +12,7 @@
   },
   "kafka": {
     "bootstrap_servers": "broker:9092",
-    "topic": "asm1-output"
+    "consumer_topic": "asm1-output",
+    "producer_topic": "asm3-output"
   }
 }
