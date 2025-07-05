@@ -39,7 +39,8 @@ if __name__ == '__main__':
     if consumer:
         try:
             for message in consumer:
-                logger.info(f"Received message from topic {message.topic}: {message.value}")
+                sender = message.value.get('sender', 'Unknown Sender')
+                logger.info(f"Received message from topic {message.topic} (from {sender}): {message.value}")
                 print(f"[ASM-2 CONSUMER] Received: {message.value.get('action')} from topic {message.topic}")
         except KeyboardInterrupt:
             logger.info("Shutting down Kafka consumer.")

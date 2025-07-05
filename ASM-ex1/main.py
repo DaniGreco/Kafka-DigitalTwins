@@ -19,7 +19,7 @@ from configuration_manager import ConfigurationManager
 from model_uploader import ModelUploader
 from enforcer import EnforcerExample
 
-def run(enforcer:EnforcerExample, model_uploader:ModelUploader, producer: KafkaProducer, topic: str):
+def run(enforcer:EnforcerExample, model_uploader:ModelUploader, producer: KafkaProducer, topics: list[str]):
     """
     Run a series of tests for the Target System, with or without an ASM model used as enforcement policy specification
 
@@ -28,7 +28,7 @@ def run(enforcer:EnforcerExample, model_uploader:ModelUploader, producer: KafkaP
         enforcer (Enforcer or None):  enforcement module (if any) to validate and correct actions.
         model_uploader(ModelUploader or None): module for uploading the ASM model and its libraries.
         producer (KafkaProducer): Kafka producer to send messages.
-        topic (str): Kafka topic to send messages to.
+        topics (list[str]): Kafka topics to send messages to.
    
     Returns:
         None
@@ -91,10 +91,11 @@ def run(enforcer:EnforcerExample, model_uploader:ModelUploader, producer: KafkaP
         
         # Send the action to Kafka
         try:
-            future = producer.send(topic, {'action': out_action})
-            record_metadata = future.get(timeout=10)
-            logger.info(f"Sent message to Kafka topic {topic}: {out_action} at offset {record_metadata.offset}")
-            print(f"[ASM-1 PRODUCER] Sent: {out_action} to topic {topic}")
+            for topic in topics:
+                future = producer.send(topic, {'action': out_action, 'sender': 'ASM-ex1'})
+                record_metadata = future.get(timeout=10)
+                logger.info(f"Sent message to Kafka topic {topic}: {out_action} at offset {record_metadata.offset}")
+                print(f"[ASM-1 PRODUCER] Sent: {out_action} to topic {topic}")
         except KafkaError as e:
             logger.error(f"Failed to send message to Kafka: {e}")
 
@@ -163,11 +164,11 @@ if __name__ == '__main__':
     enforcer = EnforcerExample(ip, port, asm_file_name)
     model_uploader = ModelUploader(ip, port, asm_path, asm_file_name)
     try:            
-        run(enforcer, model_uploader, producer, kafka_params.get('topic'))
+        run(enforcer, model_uploader, producer, kafka_params.get('topics'))
     except Exception as e:
         # Try to run the tests again without the ASM model if at a certain point the server is down  
         logger.error(f"Failed to connect to the server - Executing the test runs WITHOUT the model")            
-        run(None, None, None, None)
+        run(None, None, None, [])
     finally:
         if producer:
             producer.close()

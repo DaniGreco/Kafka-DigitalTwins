@@ -38,7 +38,7 @@ def run_simulation(enforcer:EnforcerExample, model_uploader:ModelUploader, produ
 
     # Send the action to Kafka
     try:
-        future = producer.send(producer_topic, {'action': out_action})
+        future = producer.send(producer_topic, {'action': out_action, 'sender': 'ASM-ex3'})
         record_metadata = future.get(timeout=10)
         logger.info(f"Sent message to Kafka topic {producer_topic}: {out_action} at offset {record_metadata.offset}")
         print(f"[ASM-3 PRODUCER] Sent: {out_action} to topic {producer_topic}")
@@ -59,7 +59,7 @@ def consumer_thread(consumer: KafkaConsumer, enforcer: EnforcerExample, model_up
             print(f"[ASM-3 CONSUMER] Received: {message.value.get('action')} from topic {message.topic}")
             action = message.value.get('action')
             if action:
-                run_simulation(enforcer, model_uploader, producer, producer_topic, action)
+                                run_simulation(enforcer, model_uploader, producer, producer_topic, action)
     except KeyboardInterrupt:
         logger.info("Shutting down Kafka consumer thread.")
     finally:
@@ -98,7 +98,7 @@ if __name__ == '__main__':
                 bootstrap_servers=kafka_params['bootstrap_servers'],
                 value_deserializer=lambda v: json.loads(v.decode('utf-8')),
                 auto_offset_reset='earliest',
-                group_id='asm-consumers'
+                group_id='asm3-consumer-group'
             )
             logger.info("Kafka consumer initialized successfully.")
 

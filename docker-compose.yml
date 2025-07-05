@@ -94,37 +94,37 @@ services:
         echo "Waiting for Kafka to be ready..."
         cub kafka-ready -b broker:9092 1 20
         echo "Creating topics..."
-        kafka-topics --create --if-not-exists --topic asm1-output --bootstrap-server broker:9092 --partitions 1 --replication-factor 1
-        kafka-topics --create --if-not-exists --topic asm3-output --bootstrap-server broker:9092 --partitions 1 --replication-factor 1
+        kafka-topics --create --if-not-exists --topic asm1-to-asm3 --bootstrap-server broker:9092 --partitions 1 --replication-factor 1
+        kafka-topics --create --if-not-exists --topic asm2-input --bootstrap-server broker:9092 --partitions 1 --replication-factor 1
         echo "Topics created."
 
-  producer:
-    build:
-      context: ./producer
-    container_name: producer
-    networks:
-      - kafka-network
-    volumes:
-      - ./producer/logs:/app/logs
-    extra_hosts:
-      - "host.docker.internal:host-gateway"
-    environment:
-      KAFKA_BOOTSTRAP_SERVERS: "broker:9092"
-    depends_on:
-      broker:
-        condition: service_healthy
+  #producer:
+    #build:
+      #context: ./producer
+    #container_name: producer
+    #networks:
+      #- kafka-network
+    #volumes:
+      #- ./producer/logs:/app/logs
+    #extra_hosts:
+      #- "host.docker.internal:host-gateway"
+    #environment:
+      #KAFKA_BOOTSTRAP_SERVERS: "broker:9092"
+    #depends_on:
+      #broker:
+        #condition: service_healthy
 
-  consumer:
-    build:
-      context: ./consumer
-    container_name: consumer
-    networks:
-      - kafka-network
-    environment:
-      KAFKA_BOOTSTRAP_SERVERS: "broker:9092"
-    depends_on:
-      broker:
-        condition: service_healthy
+  #consumer:
+    #build:
+      #context: ./consumer
+    #container_name: consumer
+    #networks:
+      #- kafka-network
+    #environment:
+      #KAFKA_BOOTSTRAP_SERVERS: "broker:9092"
+    #depends_on:
+      #broker:
+        #condition: service_healthy
 
   asmeta-server:
     build:
@@ -132,7 +132,7 @@ services:
       dockerfile: Dockerfile
     container_name: asmeta-server
     networks:
-      - asmeta-server
+      - kafka-network
     ports:
       - "8080:8080"
 
@@ -143,7 +143,6 @@ services:
     container_name: asm1
     networks:
       - kafka-network
-      - asmeta-server
     volumes:
       - ./ASM-ex1/log:/app/log
       - ./ASM-ex1/config.json:/app/config.json
@@ -162,7 +161,6 @@ services:
     container_name: asm2
     networks:
       - kafka-network
-      - asmeta-server
     volumes:
       - ./ASM-ex2/log:/app/log
       - ./ASM-ex2/config.json:/app/config.json
@@ -181,7 +179,6 @@ services:
     container_name: asm3
     networks:
       - kafka-network
-      - asmeta-server
     volumes:
       - ./ASM-ex3/log:/app/log
       - ./ASM-ex3/config.json:/app/config.json
@@ -195,8 +192,6 @@ services:
 
 networks:
   kafka-network:
-    driver: bridge
-  asmeta-server:
     driver: bridge
 
 volumes:
