@@ -98,34 +98,6 @@ services:
         kafka-topics --create --if-not-exists --topic asm2-input --bootstrap-server broker:9092 --partitions 1 --replication-factor 1
         echo "Topics created."
 
-  #producer:
-    #build:
-      #context: ./producer
-    #container_name: producer
-    #networks:
-      #- kafka-network
-    #volumes:
-      #- ./producer/logs:/app/logs
-    #extra_hosts:
-      #- "host.docker.internal:host-gateway"
-    #environment:
-      #KAFKA_BOOTSTRAP_SERVERS: "broker:9092"
-    #depends_on:
-      #broker:
-        #condition: service_healthy
-
-  #consumer:
-    #build:
-      #context: ./consumer
-    #container_name: consumer
-    #networks:
-      #- kafka-network
-    #environment:
-      #KAFKA_BOOTSTRAP_SERVERS: "broker:9092"
-    #depends_on:
-      #broker:
-        #condition: service_healthy
-
   asmeta-server:
     build:
       context: ./external/ASMeta/asmeta_server
