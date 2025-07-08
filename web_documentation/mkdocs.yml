@@ -3,3 +3,8 @@ theme:
   name: material
 nav:
   - Home: index.md
+  - Riferimento Codice:
+    - ASM-ex1: code_reference/asm1.md
+    - ASM-ex2: code_reference/asm2.md
+    - ASM-ex3: code_reference/asm3.md
+    - Moduli Condivisi: code_reference/shared_modules.md
