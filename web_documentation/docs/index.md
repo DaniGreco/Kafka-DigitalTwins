@@ -141,11 +141,13 @@ Modifica i percorsi ai modelli ASM per sperimentazioni diverse.
 | Loop infinito su consumer | Offset non committato | Cancella gruppo: `kafka-consumer-groups --bootstrap-server kafka:9092 --delete --group asm3` |
 
 ## 9. Conformità IEEE
-Questo documento segue la struttura raccomandata da **IEEE Std 830‑1998** per la specifica dei requisiti software (SRS):  
-- **Introduzione** §§1–2  
-- **Descrizione generale** §§3–4  
-- **Requisiti specifici** §§5–8  
-- **Appendice / Riferimenti** §§9–11  
+
+Il documento è organizzato secondo la struttura consigliata dallo **IEEE Std 830‑1998** per le Specifiche dei Requisiti Software (SRS):
+
+- **Introduzione** – §§ 1‑2  
+- **Descrizione generale** – §§ 3‑4  
+- **Requisiti specifici** – §§ 5‑8  
+- **Appendici / Riferimenti** – §§ 9‑11
 
 ## 10. Struttura del Repository
 ```
