@@ -2,7 +2,6 @@
 # Kafka‑DigitalTwins – Specifica Software  
 > **Versione**: 2025-07-09  
 > **Stato**: *Release Candidate* – verificata e pronta alla consegna  
-> **Formato**: IEEE Std 830‑1998 (Software Requirements Specification)
 
 ---
 
@@ -21,15 +20,14 @@
 6. [Configurazione](#6-configurazione)  
 7. [Estendere la Pipeline](#7-estendere-la-pipeline)  
 8. [Troubleshooting](#8-troubleshooting)  
-9. [Conformità IEEE](#9-conformità-ieee)  
-10. [Struttura del Repository](#10-struttura-del-repository)  
-11. [Riferimenti](#11-riferimenti)  
+9. [Struttura del Repository](#9-struttura-del-repository)  
+10. [Riferimenti](#10-riferimenti)  
 
 ---
 
 ## 1. Introduzione
 Questo progetto implementa una **pipeline di validazione distribuita** basata su **Apache Kafka** e sul **simulatore REST ASMetaS** per Abstract State Machines (ASM).  
-Ogni nodo riceve eventi da Kafka, li invia al simulatore, riceve la risposta e la pubblica su un topic di uscita, consentendo l’orchestrazione di più modelli ASM in catena.
+Ogni nodo riceve eventi da Kafka, li invia al simulatore, riceve la risposta e, se previsto, la pubblica su un topic di uscita, consentendo l’orchestrazione di più modelli ASM in catena.
 
 ## 2. Architettura di Sistema
 ```mermaid
@@ -40,7 +38,7 @@ flowchart LR
     T2["asm3-output"]
   end
 
-  EX1([ASM-ex1<br/>Consumer/Producer])
+  EX1([ASM-ex1<br/>Producer])
   EX3([ASM-ex3<br/>Consumer/Producer])
   EX2([ASM-ex2<br/>Consumer])
   S[ASMetaS<br/>REST]
@@ -54,7 +52,7 @@ flowchart LR
 
 ### 2.1 Vista d’insieme
 - **Kafka Cluster**: backbone di messaggistica a bassa latenza.  
-- **Contenitori ASM‑ex\***: wrapper Python che consumano/producono eventi e invocano **ASMetaS**.  
+- **Contenitori ASM‑ex\***: wrapper Python che consumano/producono eventi (a seconda del ruolo) e invocano **ASMetaS**.  
 - **ASMetaS Server**: servizio Java che offre endpoint `POST /asm`, `PUT /asm/next`, `DELETE /asm` per avviare, far evolvere e terminare una simulazione.
 
 ## 3. Componenti
@@ -72,12 +70,12 @@ Container Java basato sul repo *ASMetaS-web-service*. Espone:
 | `DELETE` | `/asm` | Termina la simulazione |
 
 ### 3.3 Modulo ASM‑ex1
-- **Ruolo**: primo validatore; genera messaggi iniziali.  
+- **Ruolo**: **Producer** che genera i messaggi iniziali della pipeline.  
 - **Topic OUT**: `asm1-output`  
 - **Modello ASM**: `inc-dec-multi.asm`  
 
 ### 3.4 Modulo ASM‑ex3
-- **Ruolo**: validatore intermedio.  
+- **Ruolo**: consumer intermedio e nuovo producer.  
 - **Topic IN**: `asm1-output`   **Topic OUT**: `asm3-output`  
 - **Modello ASM**: `traffic-light.asm`  
 
@@ -93,7 +91,7 @@ Funzioni riutilizzabili in `shared_modules/`:
 - `logging_conf.py`: configurazione logging uniforme.
 
 ## 4. Flusso dei Dati
-1. **ASM‑ex1** riceve/crea evento E₀ → lo invia ad ASMetaS.  
+1. **ASM‑ex1** crea evento E₀ → lo invia ad ASMetaS.  
 2. Risposta R₁ pubblicata su `asm1-output`.  
 3. **ASM‑ex3** legge R₁, invia a ASMetaS, produce R₂ su `asm3-output`.  
 4. **ASM‑ex2** consuma R₂, lo valida/archivia.  
@@ -140,24 +138,15 @@ Modifica i percorsi ai modelli ASM per sperimentazioni diverse.
 | Crash ASMetaS con `ConcurrentModificationException` | Bug interno al simulatore | `docker restart asmetas`; apri issue nel repo ASMetaS |
 | Loop infinito su consumer | Offset non committato | Cancella gruppo: `kafka-consumer-groups --bootstrap-server kafka:9092 --delete --group asm3` |
 
-## 9. Conformità IEEE
-
-Il documento è organizzato secondo la struttura consigliata dallo **IEEE Std 830‑1998** per le Specifiche dei Requisiti Software (SRS):
-
-- **Introduzione** – §§ 1‑2  
-- **Descrizione generale** – §§ 3‑4  
-- **Requisiti specifici** – §§ 5‑8  
-- **Appendici / Riferimenti** – §§ 9‑11
-
-## 10. Struttura del Repository
+## 9. Struttura del Repository
 ```
 Kafka-DigitalTwins/
-├── ASM-ex1/                # Nodo producer/validator
+├── ASM-ex1/                # Nodo producer
 │   ├── main.py
 │   ├── enforcer.py
 │   └── config.json
 ├── ASM-ex2/                # Nodo consumer finale
-├── ASM-ex3/                # Nodo intermedio
+├── ASM-ex3/                # Nodo consumer+producer
 ├── shared_modules/         # Utility comuni
 ├── docker-compose.yml
 └── web_documentation/
@@ -166,7 +155,7 @@ Kafka-DigitalTwins/
         └── index.md        # <— questo file
 ```
 
-## 11. Riferimenti
+## 10. Riferimenti
 1. **Apache Kafka – Documentation**  
    <https://kafka.apache.org/documentation>  
 2. **ASMetaS‑web‑service (Foselab)**  
