@@ -36,14 +36,14 @@ Ogni nodo riceve eventi da Kafka, li invia al simulatore, riceve la risposta e l
 flowchart LR
   subgraph Kafka
     direction LR
-    T1[topic "asm1-output"]
-    T2[topic "asm3-output"]
+    T1["asm1-output"]
+    T2["asm3-output"]
   end
 
   EX1([ASM-ex1<br/>Consumer/Producer])
   EX3([ASM-ex3<br/>Consumer/Producer])
   EX2([ASM-ex2<br/>Consumer])
-  S[ASMetaS<br/>REST Server]
+  S[ASMetaS<br/>REST]
 
   EX1 -- produces --> T1 --> EX3
   EX3 -- produces --> T2 --> EX2
@@ -54,7 +54,7 @@ flowchart LR
 
 ### 2.1 Vista d’insieme
 - **Kafka Cluster**: backbone di messaggistica a bassa latenza.  
-- **Contenitori ASM‐ex\***: wrapper Python che consumano/producono eventi e invocano **ASMetaS**.  
+- **Contenitori ASM‑ex\***: wrapper Python che consumano/producono eventi e invocano **ASMetaS**.  
 - **ASMetaS Server**: servizio Java che offre endpoint `POST /asm`, `PUT /asm/next`, `DELETE /asm` per avviare, far evolvere e terminare una simulazione.
 
 ## 3. Componenti
