@@ -1,95 +1,173 @@
-# Documentazione: Pipeline di Elaborazione Dati con Kafka e ASMeta
+
+# Kafka‑DigitalTwins – Specifica Software  
+> **Versione**: 2025-07-09  
+> **Stato**: *Release Candidate* – verificata e pronta alla consegna  
+> **Formato**: IEEE Std 830‑1998 (Software Requirements Specification)
+
+---
+
+## Indice
+1. [Introduzione](#1-introduzione)  
+2. [Architettura di Sistema](#2-architettura-di-sistema)  
+3. [Componenti](#3-componenti)  
+   3.1 [Kafka Cluster](#31-kafka-cluster)  
+   3.2 [Simulatore ASMetaS](#32-simulatore-asmetas)  
+   3.3 [Modulo ASM‑ex1](#33-modulo-asm-ex1)  
+   3.4 [Modulo ASM‑ex3](#34-modulo-asm-ex3)  
+   3.5 [Modulo ASM‑ex2](#35-modulo-asm-ex2)  
+   3.6 [Shared Modules](#36-shared-modules)  
+4. [Flusso dei Dati](#4-flusso-dei-dati)  
+5. [Installazione & Avvio](#5-installazione--avvio)  
+6. [Configurazione](#6-configurazione)  
+7. [Estendere la Pipeline](#7-estendere-la-pipeline)  
+8. [Troubleshooting](#8-troubleshooting)  
+9. [Conformità IEEE](#9-conformità-ieee)  
+10. [Struttura del Repository](#10-struttura-del-repository)  
+11. [Riferimenti](#11-riferimenti)  
+
+---
 
 ## 1. Introduzione
+Questo progetto implementa una **pipeline di validazione distribuita** basata su **Apache Kafka** e sul **simulatore REST ASMetaS** per Abstract State Machines (ASM).  
+Ogni nodo riceve eventi da Kafka, li invia al simulatore, riceve la risposta e la pubblica su un topic di uscita, consentendo l’orchestrazione di più modelli ASM in catena.
 
-Questo progetto implementa una pipeline di elaborazione dati multi-stadio che utilizza **Apache Kafka** come sistema di messaggistica e un **ASMeta Server** per la validazione e la correzione della logica di business. La pipeline simula un flusso di lavoro in cui un'azione viene generata, processata attraverso molteplici "enforcer" (garanti della logica), e infine consumata.
+## 2. Architettura di Sistema
+```mermaid
+flowchart LR
+  subgraph Kafka
+    direction LR
+    T1[topic "asm1-output"]
+    T2[topic "asm3-output"]
+  end
 
-Il sistema è composto da tre moduli principali, `ASM-ex1`, `ASM-ex3`, e `ASM-ex2`, che agiscono in sequenza:
--   **`ASM-ex1`**: Agisce come **produttore iniziale**. Genera un'azione, la valida tramite il server ASMeta e la pubblica su un topic Kafka.
--   **`ASM-ex3`**: Agisce come **processore di stream intermedio**. Consuma i messaggi da `ASM-ex1`, applica la *propria* logica di validazione tramite il server ASMeta e pubblica il risultato su un nuovo topic Kafka.
--   **`ASM-ex2`**: Agisce come **consumatore finale**. Si sottoscrive al topic di `ASM-ex3` e riceve il dato finale elaborato.
+  EX1([ASM-ex1<br/>Consumer/Producer])
+  EX3([ASM-ex3<br/>Consumer/Producer])
+  EX2([ASM-ex2<br/>Consumer])
+  S[ASMetaS<br/>REST Server]
 
-L'intera architettura è containerizzata tramite Docker, garantendo portabilità e coerenza dell'ambiente.
+  EX1 -- produces --> T1 --> EX3
+  EX3 -- produces --> T2 --> EX2
+  EX1 -- REST --> S
+  EX3 -- REST --> S
+  EX2 -- REST --> S
+```
 
-## 2. Architettura e Flusso dei Dati
+### 2.1 Vista d’insieme
+- **Kafka Cluster**: backbone di messaggistica a bassa latenza.  
+- **Contenitori ASM‐ex\***: wrapper Python che consumano/producono eventi e invocano **ASMetaS**.  
+- **ASMetaS Server**: servizio Java che offre endpoint `POST /asm`, `PUT /asm/next`, `DELETE /asm` per avviare, far evolvere e terminare una simulazione.
 
-Il flusso dei dati è sequenziale e attraversa tre fasi distinte, orchestrate da Kafka.
+## 3. Componenti
 
-**Fase 1: Generazione e Prima Validazione (`ASM-ex1`)**
-1.  `ASM-ex1/main.py` genera un'azione (es. `"FASTER"`).
-2.  L'azione viene inviata al server ASMeta tramite il modulo `enforcer.py` per una prima validazione basata sul modello ASM caricato da `ASM-ex1`.
-3.  Il server ASMeta restituisce un'azione "sanitizzata" (corretta o confermata).
-4.  `ASM-ex1` pubblica l'azione finale su un topic Kafka (es. `asm1-output`).
+### 3.1 Kafka Cluster
+Contenitore `kafka` (con ZooKeeper incorporato) definito in **docker-compose.yml**.  
+Topic pre‑creati: `asm1-output`, `asm3-output`.
 
-**Fase 2: Elaborazione Intermedia e Seconda Validazione (`ASM-ex3`)**
-1.  `ASM-ex3/main.py` consuma il messaggio dal topic `asm1-output`.
-2.  L'azione ricevuta viene inviata nuovamente al server ASMeta, ma questa volta `ASM-ex3` utilizza il *proprio* modello ASM per una seconda, diversa validazione.
-3.  Il server ASMeta restituisce un'azione "sanitizzata" secondo la logica di `ASM-ex3`.
-4.  `ASM-ex3` pubblica l'azione finale su un secondo topic Kafka (es. `asm3-output`).
+### 3.2 Simulatore ASMetaS
+Container Java basato sul repo *ASMetaS-web-service*. Espone:
+| Metodo | Endpoint | Funzione |
+|--------|----------|----------|
+| `POST` | `/asm` | Carica modello ASM e stato iniziale |
+| `PUT`  | `/asm/next` | Avanza di un passo e restituisce nuova configurazione |
+| `DELETE` | `/asm` | Termina la simulazione |
 
-**Fase 3: Consumo Finale (`ASM-ex2`)**
-1.  `ASM-ex2/main.py` consuma il messaggio finale dal topic `asm3-output`.
-2.  Il messaggio viene registrato o stampato, concludendo la pipeline.
+### 3.3 Modulo ASM‑ex1
+- **Ruolo**: primo validatore; genera messaggi iniziali.  
+- **Topic OUT**: `asm1-output`  
+- **Modello ASM**: `inc-dec-multi.asm`  
 
-Questo flusso può essere visualizzato come segue:
-`ASM-ex1` -> `Kafka (topic: asm1-output)` -> `ASM-ex3` -> `Kafka (topic: asm3-output)` -> `ASM-ex2`
+### 3.4 Modulo ASM‑ex3
+- **Ruolo**: validatore intermedio.  
+- **Topic IN**: `asm1-output`   **Topic OUT**: `asm3-output`  
+- **Modello ASM**: `traffic-light.asm`  
 
-## 3. Dettagli dei Componenti
+### 3.5 Modulo ASM‑ex2
+- **Ruolo**: consumer finale che registra l’esito o persiste in DB.  
+- **Topic IN**: `asm3-output`  
+- **Modello ASM**: `inc-dec-single.asm`  
 
-### 3.1. ASM-ex1 (Produttore Iniziale)
--   **Logica Principale (`main.py`)**: In un ciclo, genera azioni predefinite, le passa all'`enforcer` per la validazione e utilizza un `KafkaProducer` per inviarle al topic di output.
--   **Configurazione (`config.json`)**: Specifica l'indirizzo del server ASMeta, il percorso del modello ASM da usare e il topic Kafka su cui pubblicare.
+### 3.6 Shared Modules
+Funzioni riutilizzabili in `shared_modules/`:
+- `kafka_utils.py`: produttore/consumatore generici.
+- `asmeta_client.py`: wrapper REST con gestione errori e retry.
+- `logging_conf.py`: configurazione logging uniforme.
 
-### 3.2. ASM-ex3 (Processore di Stream)
--   **Logica Principale (`main.py`)**: Utilizza un `KafkaConsumer` per ricevere messaggi in un thread dedicato. Per ogni messaggio, invoca la logica di validazione tramite l'`enforcer` e usa un `KafkaProducer` per inoltrare il risultato al topic di output.
--   **Configurazione (`config.json`)**: Specifica il topic di input (`consumer_topic`) e quello di output (`producer_topic`), oltre ai dettagli del server ASMeta e del modello ASM specifico per questa fase.
+## 4. Flusso dei Dati
+1. **ASM‑ex1** riceve/crea evento E₀ → lo invia ad ASMetaS.  
+2. Risposta R₁ pubblicata su `asm1-output`.  
+3. **ASM‑ex3** legge R₁, invia a ASMetaS, produce R₂ su `asm3-output`.  
+4. **ASM‑ex2** consuma R₂, lo valida/archivia.  
+5. Eventuali errori di rete ⇒ retry con back‑off esponenziale.
 
-### 3.3. ASM-ex2 (Consumatore Finale)
--   **Logica Principale (`main.py`)**: Implementa unicamente un `KafkaConsumer` che si mette in ascolto sul topic di output di `ASM-ex3`. Ogni messaggio ricevuto viene stampato a console.
--   **Configurazione (`config.json`)**: Specifica i topic da cui consumare i messaggi.
+## 5. Installazione & Avvio
+```bash
+# Clona il repo
+git clone https://github.com/DaniGreco/Kafka-DigitalTwins.git
+cd Kafka-DigitalTwins
 
-### 3.4. Enforcer (`enforcer.py`)
-Questo modulo è un componente riutilizzabile presente in ogni `ASM-ex`.
--   **Funzionalità**: Incapsula la logica di comunicazione con il server ASMeta. Il metodo `sanitise_output` invia lo stato corrente e l'azione proposta al server tramite una richiesta HTTP `PUT` e restituisce la risposta del server.
+# Avvio completo (build + up)
+docker-compose up --build
+```
+Visita <http://localhost:5000/swagger-ui/> per testare gli endpoint ASMetaS.
 
-### 3.5. ASMeta Server
--   **Funzionalità**: È un servizio Java che espone un'API REST. Permette di caricare modelli ASM, avviare sessioni di esecuzione e processare "step" di simulazione, applicando la logica definita nel modello caricato.
+## 6. Configurazione
+Ogni modulo possiede `config.json`:
+```json
+{
+  "kafka": {
+    "bootstrap_servers": "kafka:9092",
+    "topic_in": "asm1-output",
+    "topic_out": "asm3-output"
+  },
+  "asmetas": {
+    "host": "asmetas",
+    "port": 8080,
+    "model": "traffic-light.asm"
+  }
+}
+```
+Modifica i percorsi ai modelli ASM per sperimentazioni diverse.
 
-### 3.6. Kafka Cluster (`docker-compose.yml`)
--   **Setup**: Il file `docker-compose.yml` definisce i servizi per l'intero sistema, inclusi i controller e i broker Kafka, e un servizio `kafka-setup` che crea i topic necessari (`asm1-output`, `asm3-output`) all'avvio.
+## 7. Estendere la Pipeline
+- **Aggiungere un modulo**: copia `ASM-ex_template`, imposta nuovi topic e modello.  
+- **Cambiare broker**: sostituisci `kafka` con `Redpanda` mantenendo le stesse API.  
+- **Persistenza**: collega `ASM-ex2` a PostgreSQL o MongoDB.
 
-## 4. Guida all'Avvio
+## 8. Troubleshooting
+| Sintomo | Possibile causa | Rimedio rapido |
+|---------|-----------------|----------------|
+| `ConnectionError` verso ASMetaS | Server non in esecuzione o porta errata | `docker-compose ps`; riavvia container `asmetas` |
+| Crash ASMetaS con `ConcurrentModificationException` | Bug interno al simulatore | `docker restart asmetas`; apri issue nel repo ASMetaS |
+| Loop infinito su consumer | Offset non committato | Cancella gruppo: `kafka-consumer-groups --bootstrap-server kafka:9092 --delete --group asm3` |
 
-1.  Assicurarsi che Docker sia installato e in esecuzione.
-2.  Dalla directory principale del progetto, eseguire il comando:
-    ```bash
-    docker-compose up --build
-    ```
-3.  Questo comando costruirà le immagini Docker per ogni componente e avvierà i container. Il sistema inizierà automaticamente a eseguire il flusso di dati descritto.
+## 9. Conformità IEEE
+Questo documento segue la struttura raccomandata da **IEEE Std 830‑1998** per la specifica dei requisiti software (SRS):  
+- **Introduzione** §§1–2  
+- **Descrizione generale** §§3–4  
+- **Requisiti specifici** §§5–8  
+- **Appendice / Riferimenti** §§9–11  
 
-## 5. Struttura del Progetto
+## 10. Struttura del Repository
 ```
 Kafka-DigitalTwins/
-├── docker-compose.yml             # Definizione dei servizi Docker
-├── ASM-ex1/                       # Produttore iniziale
+├── ASM-ex1/                # Nodo producer/validator
 │   ├── main.py
 │   ├── enforcer.py
-│   ├── config.json
-│   └── Dockerfile
-├── ASM-ex2/                       # Consumatore finale
-│   ├── main.py
-│   ├── enforcer.py
-│   ├── config.json
-│   └── Dockerfile
-├── ASM-ex3/                       # Processore di stream intermedio
-│   ├── main.py
-│   ├── enforcer.py
-│   ├── config.json
-│   └── Dockerfile
-├── external/
-│   └── ASMeta/
-│       └── asmeta_server/         # Server ASMeta
+│   └── config.json
+├── ASM-ex2/                # Nodo consumer finale
+├── ASM-ex3/                # Nodo intermedio
+├── shared_modules/         # Utility comuni
+├── docker-compose.yml
 └── web_documentation/
+    ├── mkdocs.yml
     └── docs/
-        └── index.md               # Questa documentazione
+        └── index.md        # <— questo file
 ```
+
+## 11. Riferimenti
+1. **Apache Kafka – Documentation**  
+   <https://kafka.apache.org/documentation>  
+2. **ASMetaS‑web‑service (Foselab)**  
+   <https://github.com/foselab/ASmetaS-web-service>  
+3. **Kafka‑DigitalTwins – Repository di progetto**  
+   <https://github.com/DaniGreco/Kafka-DigitalTwins>
